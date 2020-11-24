@@ -19,8 +19,9 @@ const refs = {
     lightboxRef: document.querySelector(".lightbox"),
     lightboxImageRef: document.querySelector(".lightbox__image"),
     lightboxContentRef: document.querySelector(".lightbox__content"),
-    lightBoxBtnRef: document.querySelector(".lightbox__button")
-};
+    lightBoxBtnRef: document.querySelector(".lightbox__button"),
+    lightBoxOverlay: document.querySelector("lightbox__overlay")
+}
 
 function onMakerGallery (galleryItems) {
     return galleryItems.map(({ preview, original, description }) => {
@@ -28,7 +29,7 @@ function onMakerGallery (galleryItems) {
             galleryItemRef: document.createElement('li'),
             galleryListRef: document.createElement('a'),
             imageRef: document.createElement('img')
-    };
+    }
 
         localRefs.galleryItemRef.classList.add('gallery__item');
         localRefs.galleryListRef.classList.add('gallery__link');
@@ -43,7 +44,7 @@ function onMakerGallery (galleryItems) {
 
         return localRefs.galleryItemRef; 
     });
-};
+}
 
 function onImageClick (event) {
 
@@ -51,29 +52,67 @@ function onImageClick (event) {
 
         if (event.target.nodeName !== 'IMG') {
          return;
-    };
+    }
 
         const targImg = event.target;
-        console.log(targImg);
-        const altRef = targImg.getAttribute("alt"); 
-        const largeImg = targImg.dataset.source;
-        refs.lightboxImageRef.src = largeImg;    
-        refs.lightboxImageRef.alt = altRef;
+        refs.lightboxImageRef.src = targImg.dataset.source;   
+        refs.lightboxImageRef.alt = targImg.getAttribute("alt");
         refs.lightboxRef.classList.add("is-open");
-  
-}; 
+          
+}
  
 function onCloseModal() {
         refs.lightboxRef.classList.remove("is-open");
-    };
+        // refs.lightboxImageRef.src = null;
+        // refs.lightboxImageRef.alt = null;
+    }
 
 function onKeyupEsc(event) {
         if (event.code === "Escape") {
          onCloseModal();
-    };
-};
+    }
+}
+
+// function onOverlayClick() {
+//     onCloseModal();
+// } 
+
 
 onMakerGallery(galleryItems);
 refs.listGalleryRef.addEventListener("click", onImageClick);
 refs.lightBoxBtnRef.addEventListener("click", onCloseModal);
+refs.lightBoxOverlay.addEventListener("click", onCloseModal);
 window.addEventListener("keyup", onKeyupEsc);
+
+
+const checkButton = function (e) {
+    if (indexCurrenElement === undefined) {
+      indexCurrenElement = parseInt(e.target.firstChild.dataset.index); /* проверка на наличие стартового индекса, работает только один раз*/
+    }
+    if (e.code === "Escape") {
+      modalIsClose();
+    } else if (e.code === "ArrowRight") {
+      moveInGallary("right");
+    } else if (e.code === "ArrowLeft") {
+      moveInGallary("left");
+    } else {
+      return;
+    }
+  };
+  const moveInGallary = function (indexToMove) {
+    if (indexToMove === "right") {
+      indexCurrenElement += 1;
+      if (indexCurrenElement > gallary.length - 1) {
+        indexCurrenElement = 0;
+      }
+    } else if (indexToMove === "left") {
+      indexCurrenElement -= 1;
+      if (indexCurrenElement < 0) {
+        indexCurrenElement = gallary.length - 1;
+      }
+    }
+    changeImg(
+      document.querySelector(`img[data-index="${indexCurrenElement}"]`).dataset
+        .sourse
+    );
+  };
